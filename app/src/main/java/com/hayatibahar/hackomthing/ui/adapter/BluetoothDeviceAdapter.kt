@@ -1,33 +1,48 @@
 package com.hayatibahar.hackomthing.ui.adapter
 
-import android.bluetooth.BluetoothDevice
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.hayatibahar.hackomthing.databinding.RecyclerItemBinding
+import com.hayatibahar.hackomthing.databinding.DeviceItemBinding
 import com.hayatibahar.hackomthing.domain.BluetoothDeviceDomain
 
 
 class BluetoothDeviceAdapter(
-    private val devices: List<BluetoothDeviceDomain>,
     private val onClick: (BluetoothDeviceDomain) -> Unit,
 ) :
-    RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder>() {
+    RecyclerView.Adapter<BluetoothDeviceAdapter.DeviceViewHolder>() {
 
-    class ViewHolder(val binding: RecyclerItemBinding) : RecyclerView.ViewHolder(binding.root)
+    private val devices = mutableListOf<BluetoothDeviceDomain>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =
-            RecyclerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+     inner class DeviceViewHolder(private val binding: DeviceItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(device: BluetoothDeviceDomain) {
+            with(binding) {
+                deviceName.text = device.name ?: "(No name)"
+                root.setOnClickListener { onClick(device) }
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val device = devices[position]
-        holder.binding.deviceName.text = device.name ?: "(No name)"
-        holder.binding.root.setOnClickListener { onClick(device) }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder{
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = DeviceItemBinding.inflate(inflater,parent,false)
+        return DeviceViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: DeviceViewHolder, position: Int) {
+        holder.bind(devices[position])
     }
 
     override fun getItemCount() = devices.size
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateItems(newDevices: List<BluetoothDeviceDomain>) {
+        devices.clear()
+        devices.addAll(newDevices)
+        notifyDataSetChanged()
+    }
 }
 
