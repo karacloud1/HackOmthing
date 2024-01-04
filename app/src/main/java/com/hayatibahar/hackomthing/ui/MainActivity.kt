@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun deviceClickEvent(device: BluetoothDeviceDomain) {
+    private fun deviceClickEvent(device: BluetoothDeviceDomain) {
         Toast.makeText(this, "${device.name}", Toast.LENGTH_SHORT).show()
     }
 }
