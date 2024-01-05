@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -52,6 +53,9 @@ class MainActivity : AppCompatActivity() {
             stopScanBtn.setOnClickListener {
                 viewModel.stopScan()
             }
+            startServerBtn.setOnClickListener {
+                viewModel.waitForIncomingConnections()
+            }
             pairedDevicesRv.adapter = pairedDevicesAdapter
             pairedDevicesRv.layoutManager = LinearLayoutManager(this@MainActivity)
             scannedDevicesRv.adapter = scannedDevicesAdapter
@@ -89,11 +93,23 @@ class MainActivity : AppCompatActivity() {
             viewModel.state.collect { state ->
                 pairedDevicesAdapter.updateItems(state.pairedDevices)
                 scannedDevicesAdapter.updateItems(state.scannedDevices)
+                when {
+                    state.isConnecting -> {
+                        binding.progressCircular.visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        binding.progressCircular.visibility = View.INVISIBLE
+                    }
+                }
+                state.errorMessage?.let {
+                    Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     private fun deviceClickEvent(device: BluetoothDeviceDomain) {
-        Toast.makeText(this, "${device.name}", Toast.LENGTH_SHORT).show()
+        viewModel.connectToDevice(device)
     }
 }
