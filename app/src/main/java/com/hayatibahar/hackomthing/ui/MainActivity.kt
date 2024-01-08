@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var enableBluetoothLauncher: ActivityResultLauncher<Intent>
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
-    private val pairedDevicesAdapter = BluetoothDeviceAdapter(::deviceClickEvent)
-    private val scannedDevicesAdapter = BluetoothDeviceAdapter(::deviceClickEvent)
+    private val pairedDevicesAdapter : BluetoothDeviceAdapter by lazy { BluetoothDeviceAdapter(::deviceClickEvent) }
+    private val scannedDevicesAdapter : BluetoothDeviceAdapter by lazy { BluetoothDeviceAdapter(::deviceClickEvent) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -57,9 +57,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.waitForIncomingConnections()
             }
             pairedDevicesRv.adapter = pairedDevicesAdapter
-            pairedDevicesRv.layoutManager = LinearLayoutManager(this@MainActivity)
             scannedDevicesRv.adapter = scannedDevicesAdapter
-            scannedDevicesRv.layoutManager = LinearLayoutManager(this@MainActivity)
         }
 
         enableBluetoothLauncher = registerForActivityResult(
